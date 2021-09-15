@@ -1,0 +1,22 @@
+#!/bin/bash -ex
+export HOME=/home/ec2-user
+yum update -y
+yum install -y gcc libxml2 libxml2-devel libxslt libxslt-devel
+yum install -y ruby-devel sqlite-devel
+yum install -y gcc-c++
+yum install -y ImageMagick-devel ImageMagick-c++-devel
+yum install -y patch
+gem install bundler -v 1.16.0
+curl -o /tmp/spl11.tar.gz https://s3-us-west-2.amazonaws.com/us-west-2-aws-training/awsu-spl/spl-11/scripts/spl11v2.tar.gz
+tar xfz /tmp/spl11.tar.gz -C /home/ec2-user/
+cd /home/ec2-user/spl11/
+gem install io-console -v 0.4.6
+/usr/local/bin/bundle update rdoc
+/usr/local/bin/bundle install
+/usr/local/bin/bundle exec bin/rake db:migrate
+cat > /home/ec2-user/spl11/tmp/creds.yml << EOF
+region: REGION
+bucket_name: BUCKET
+table_name: myTable
+EOF
+/usr/local/bin/bundle exec bin/rails s -b 0.0.0.0 -p 80

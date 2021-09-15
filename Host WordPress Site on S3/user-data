@@ -1,0 +1,13 @@
+#!/bin/bash -xe
+yum update -y
+/opt/aws/bin/cfn-init -v --stack qls-9204424-4ad0d9d36b50e6af --resource WebServer --configsets wordpress_install --region us-west-2
+/opt/aws/bin/cfn-signal -e $? --stack qls-9204424-4ad0d9d36b50e6af --resource WebServer --region us-west-2
+service httpd stop
+yum remove php* -y
+yum remove httpd* -y
+yum clean all
+yum upgrade -y
+yum install httpd24 -y
+yum install php70 php70-mysqlnd php70-imap php70-pecl-memcache php70-pecl-apcu php70-gd -y
+yum install mod24_ssl -y
+service httpd start

@@ -1,0 +1,19 @@
+- Task 1 - Criar Bucket S3
+Criar Bucket S3 / Name: mybucketANYNUMBER
+Habilitar Bucket Public Access
+Criar Bucket Policy BuketPolicy.txt / Alterar o nome do Bucket na Policy
+
+- Task 2 - Criar DynamoDB
+Criar DynamoDB /  Name: myTable / Primary Key: eib
+
+- Task 3 - Deploy Front-End
+Deploy Front-End on Ec2 / Use Amazon Linux AMI v1 /  Inserir Ec2UserData.txt, altera nome do Bucket, Região e Dyanamo Table Name
+Attach an ec2 role at the instance to be able to Access DynamoDB
+https://docs.aws.amazon.com/pt_br/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
+Enable SSH and HTTP Access on SG
+
+- Task 4 - Test Deploy
+Access the EC2 using its Public IP, you shoud see a Fliks Application
+Upload some images to test it
+Check the Uploaded Files and Thumbnails on S3 Bucket
+Check the DynamoDB Itens

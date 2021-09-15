@@ -1,0 +1,58 @@
+- Task 1 - Configurar WordPress on EC2
+> Logar e Configurar WordPress via http (A instalação do wordpress foi realizada por user data ou em uma imagem)
+WordPressURL
+http://ec2-52-12-7-222.us-west-2.compute.amazonaws.com/wordpress/wp-admin/install.php
+
+- Task 2 - Create s3 website Bucket
+> Criar um s3 bucket com o nome que inicie com wordpress-XXXXXXX pois é o filtro do Script
+> Habilitar website hosting no bucket s3
+
+
+- Task 3 - Configure Script to Copy Wordpress to s3 bucket site
+> Alterar configurações do php
+sudo sed -i.bak -e 's/AllowOverride None/AllowOverride All/g' /etc/httpd/conf/httpd.conf;
+
+> httpd restart
+sudo service httpd restart
+
+> Download and run Script
+cd /var/www/html/wordpress;
+sudo wget https://us-west-2-aws-training.s3.amazonaws.com/awsu-spl/spl-39/scripts/wpstatic.sh;
+sudo /bin/sh wpstatic.sh -a;
+
+> Change Files Permission
+sudo chown -R apache:apache /var/www/html/wordpress
+
+> Access the static wordpress
+http://ec2-52-12-7-222.us-west-2.compute.amazonaws.com/wordpress/wordpress-static/index.html
+
+- Task 4 - Upload static Files to s3
+> Determine Region
+AZ=`curl --silent http://169.254.169.254/latest/meta-data/placement/availability-zone/`
+REGION=${AZ::-1}
+
+>Retrieve Amazon S3 bucket name starting with wordpress-*
+BUCKET=`aws s3api list-buckets --query "Buckets[?starts_with(Name, 'wordpress-')].Name | [0]" --output text`
+
+> Upload Files
+aws s3 sync --acl public-read /var/www/html/wordpress/wordpress-static s3://$BUCKET
+
+> Validate Files on S3
+
+> Test access to s3 static website
+
+- Task 4 - Automate Upload with Script
+> Create the Script
+echo "cd /var/www/html/wordpress; sudo rm -rf wordpress-static; sudo /bin/sh wpstatic.sh -a; aws s3 sync --acl public-read --delete /var/www/html/wordpress/wordpress-static s3://$BUCKET" > $HOME/wordpress-to-s3.sh;
+> Change executuion Permission
+chmod 0755 $HOME/wordpress-to-s3.sh;
+
+> Execute Script
+/home/ec2-user/wordpress-to-s3.sh
+
+> Test access to s3 static website
+http://ec2-52-12-7-222.us-west-2.compute.amazonaws.com/wordpress/wordpress-static/index.html
+
+> Make a new post and execte the Script
+
+> Setup the Script pn cron
